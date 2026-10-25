@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swastik Client Portal — Mentored Student Tech Venture</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js for Financial & Sprint Visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+              900: '#0c4a6e',
+            },
+            swastik: {
+              orange: '#f97316',
+              navy: '#0f172a',
+              indigo: '#4f46e5',
+              emerald: '#10b981'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    .pulse-subtle {
+      animation: pulseSubtle 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulseSubtle {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.02); }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased font-sans min-h-screen flex flex-col md:flex-row overflow-x-hidden">
+
+  <!-- ======================================================== -->
+  <!-- TOAST NOTIFICATION CONTAINER                             -->
+  <!-- ======================================================== -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- ======================================================== -->
+  <!-- MOBILE HEADER / SIDEBAR TOGGLE                           -->
+  <!-- ======================================================== -->
+  <div class="md:hidden flex items-center justify-between bg-white border-b border-slate-200 px-4 py-3 sticky top-0 z-40">
+    <div class="flex items-center space-x-2.5">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-slate-900 via-indigo-900 to-indigo-600 flex items-center justify-center text-white shadow-sm font-bold text-sm">
+        <svg class="w-4 h-4 text-orange-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div>
+        <span class="font-extrabold tracking-tight text-slate-900 text-base block leading-none">SWASTIK</span>
+        <span class="text-[9px] text-slate-500 font-medium">CEO: Mr G Sandeep Kumar</span>
+      </div>
+    </div>
+    <button onclick="toggleMobileSidebar()" class="p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition">
+      <i data-lucide="menu" class="w-5 h-5"></i>
+    </button>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- LEFT SIDEBAR NAVIGATION                                  -->
+  <!-- ======================================================== -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-slate-200 transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out md:static flex flex-col justify-between h-screen">
+    <div class="p-5 flex-1 overflow-y-auto">
+      <!-- Brand Header -->
+      <div class="mb-6 pb-4 border-b border-slate-100">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-slate-950 via-slate-900 to-indigo-700 flex items-center justify-center text-white shadow-md">
+              <svg class="w-6 h-6 text-orange-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <div>
+              <span class="font-extrabold text-xl tracking-tight text-slate-950 flex items-center gap-1">
+                SWASTIK
+              </span>
+              <span class="text-[9px] uppercase tracking-wider text-indigo-600 font-bold block">Mentored Tech Pods</span>
+            </div>
+          </div>
+          <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-400 hover:text-slate-600">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Venture Leadership Tagline -->
+        <div class="mt-3 p-2 bg-slate-50 border border-slate-200/80 rounded-xl text-[11px] text-slate-600 flex items-center gap-2">
+          <div class="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0 text-[10px] font-bold">
+            <i data-lucide="shield-check" class="w-3 h-3 text-indigo-600"></i>
+          </div>
+          <div class="leading-tight truncate">
+            <p class="font-semibold text-slate-800 truncate">Mentored Student Tech</p>
+            <p class="text-[10px] text-slate-500 truncate">Founder &amp; CEO: <strong>Mr G Sandeep Kumar</strong></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="space-y-1" id="nav-menu">
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-xs transition-colors bg-slate-900 text-white shadow-xs">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+          <span>Dashboard</span>
+        </button>
+
+        <button onclick="switchTab('pricing')" id="nav-pricing" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-xs text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors">
+          <i data-lucide="calculator" class="w-4 h-4 text-slate-500"></i>
+          <span>Project Scope &amp; Sizing</span>
+        </button>
+
+        <button onclick="switchTab('team')" id="nav-team" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-xs text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors">
+          <i data-lucide="users" class="w-4 h-4 text-slate-500"></i>
+          <span>My Pod (Team)</span>
+        </button>
+
+        <button onclick="switchTab('sprints')" id="nav-sprints" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-xs text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors">
+          <i data-lucide="milestone" class="w-4 h-4 text-slate-500"></i>
+          <span>Sprints &amp; Milestones</span>
+        </button>
+
+        <button onclick="switchTab('reviews')" id="nav-reviews" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-xs text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors">
+          <i data-lucide="shield-check" class="w-4 h-4 text-slate-500"></i>
+          <span>Mentor Sign-offs</span>
+        </button>
+
+        <button onclick="switchTab('financials')" id="nav-financials" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-xs text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors">
+          <i data-lucide="trending-up" class="w-4 h-4 text-slate-500"></i>
+          <span>Market Sizing &amp; SOM</span>
+        </button>
+
+        <button onclick="switchTab('files')" id="nav-files" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-xs text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors">
+          <i data-lucide="file-check-2" class="w-4 h-4 text-slate-500"></i>
+          <span>Approvals &amp; Escrow</span>
+        </button>
+
+        <button onclick="switchTab('feedback')" id="nav-feedback" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-xs text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors">
+          <i data-lucide="message-square" class="w-4 h-4 text-slate-500"></i>
+          <span>Client Feedback</span>
+        </button>
+
+        <button onclick="switchTab('settings')" id="nav-settings" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-xs text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors">
+          <i data-lucide="settings" class="w-4 h-4 text-slate-500"></i>
+          <span>Settings</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Founder & CEO User Card -->
+    <div class="p-3.5 border-t border-slate-200 bg-slate-50/80">
+      <div class="flex items-center space-x-3">
+        <!-- Stylized Male Avatar for Mr G Sandeep Kumar (Founder & CEO) -->
+        <div class="relative w-10 h-10 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-xs shadow-xs ring-2 ring-indigo-500/30 overflow-hidden shrink-0">
+          <svg viewBox="0 0 100 100" class="w-full h-full">
+            <circle cx="50" cy="50" r="50" fill="#1e293b"/>
+            <!-- Male avatar illustration -->
+            <path d="M50 44 a16 16 0 1 0 0 -32 a16 16 0 0 0 0 32 z" fill="#fbcfe8"/>
+            <path d="M34 26 c0 -14 32 -14 32 0 c-2 -4 -10 -8 -20 -8 c-8 0 -12 4 -12 8 z" fill="#0f172a"/>
+            <path d="M22 84 c4 -22 20 -28 28 -28 s24 6 28 28 z" fill="#3b82f6"/>
+            <!-- Collar / tie -->
+            <polygon points="50,62 46,74 50,82 54,74" fill="#f97316"/>
+          </svg>
+          <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full ring-2 ring-white"></span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-bold text-slate-900 truncate">Mr G Sandeep Kumar</p>
+          <p class="text-[10px] text-indigo-700 font-semibold truncate">Founder &amp; CEO</p>
+        </div>
+        <button onclick="triggerToast('Swastik Executive Account Verified')" class="text-slate-400 hover:text-slate-700 p-1" title="Security Verified">
+          <i data-lucide="shield" class="w-4 h-4 text-indigo-600"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Mobile Sidebar Backdrop -->
+  <div id="sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-30 hidden md:hidden"></div>
+
+  <!-- ======================================================== -->
+  <!-- MAIN APPLICATION CONTENT AREA                            -->
+  <!-- ======================================================== -->
+  <main class="flex-1 flex flex-col h-screen overflow-y-auto bg-slate-50">
+    
+    <!-- TOP STICKY HEADER -->
+    <header class="bg-white border-b border-slate-200 px-5 lg:px-8 py-3.5 sticky top-0 z-20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+      <div>
+        <div class="flex items-center space-x-3">
+          <h1 class="text-lg lg:text-xl font-bold text-slate-950 tracking-tight">Swastik Client Portal</h1>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
+            Active - Sprint 3
+          </span>
+        </div>
+        <p class="text-xs font-medium text-slate-500 mt-0.5 flex flex-wrap items-center gap-1.5">
+          <span>Project: <strong class="text-slate-800">MVP Development for Startup X</strong></span>
+          <span class="text-slate-300">•</span>
+          <span>Lead Mentor: <strong class="text-indigo-700">Sandeep Gowravam</strong></span>
+          <span class="text-slate-300">•</span>
+          <span>Executive: <strong class="text-slate-700">Mr G Sandeep Kumar (CEO)</strong></span>
+        </p>
+      </div>
+
+      <!-- Top Nav Actions -->
+      <div class="flex items-center space-x-3 self-end sm:self-center">
+        <!-- Escrow Protection Badge -->
+        <div class="hidden xl:flex items-center gap-2 bg-slate-100/90 px-3 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-700">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-indigo-600"></i>
+          <span>Escrow Protected: <strong class="text-slate-950 font-bold font-mono">₹1,50,000</strong></span>
+        </div>
+
+        <!-- Notification Bell -->
+        <div class="relative">
+          <button onclick="toggleNotificationDropdown()" class="relative p-2 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition">
+            <i data-lucide="bell" class="w-5 h-5"></i>
+            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-orange-500 rounded-full animate-pulse"></span>
+          </button>
+          
+          <!-- Dropdown Menu -->
+          <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-200 py-3 px-4 z-50 text-xs">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
+              <span class="font-bold text-slate-900">Sprint Notifications</span>
+              <span class="text-[10px] text-indigo-600 font-semibold cursor-pointer" onclick="triggerToast('All notifications marked as read')">Mark read</span>
+            </div>
+            <div class="space-y-2.5">
+              <div class="flex items-start gap-2.5 hover:bg-slate-50 p-1.5 rounded-lg cursor-pointer" onclick="openModal('modal-code-review')">
+                <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                  <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                </div>
+                <div>
+                  <p class="text-slate-800 font-medium leading-tight">Sandeep Gowravam signed off Milestone 2 APIs</p>
+                  <p class="text-slate-400 text-[10px] mt-0.5">15 mins ago • Backend Integration Passed</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-2.5 hover:bg-slate-50 p-1.5 rounded-lg cursor-pointer" onclick="openMilestoneDetails('m2')">
+                <div class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+                  <i data-lucide="git-commit" class="w-3.5 h-3.5"></i>
+                </div>
+                <div>
+                  <p class="text-slate-800 font-medium leading-tight">M Kusuma &amp; K Neeraja committed 18 PRs</p>
+                  <p class="text-slate-400 text-[10px] mt-0.5">1 hour ago • REST DB Indexing &amp; Auth</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Direct Connect with Sandeep Gowravam -->
+        <button onclick="openModal('modal-contact-mentor')" class="inline-flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition shadow-xs">
+          <i data-lucide="video" class="w-3.5 h-3.5 text-orange-400"></i>
+          <span>Sync with Mentor</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- TAB CONTENTS WRAPPER -->
+    <div class="p-4 sm:p-6 lg:p-8 space-y-6">
+
+      <!-- ======================================================== -->
+      <!-- TAB 1: MAIN DASHBOARD (EXACT PROTOTYPE REPLICATION)      -->
+      <!-- ======================================================== -->
+      <section id="tab-dashboard" class="tab-content space-y-6 block">
+        
+        <!-- SECTION 1: MATCHED POD SECTION -->
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <i data-lucide="users" class="w-4 h-4 text-indigo-600"></i>
+              Matched Pod Section
+            </h2>
+            <div class="flex items-center gap-2 text-xs">
+              <span class="text-slate-500 font-medium">Pod ID:</span>
+              <code class="font-mono bg-slate-200/80 px-2 py-0.5 rounded text-slate-800 font-semibold">POD-SWASTIK-04</code>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            
+            <!-- Industry Mentor Card: Sandeep Gowravam (5 cols) -->
+            <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between hover:border-slate-300 transition">
+              <div>
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold uppercase tracking-wider text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100 flex items-center gap-1">
+                    <i data-lucide="award" class="w-3.5 h-3.5 text-indigo-600"></i> Industry Mentor
+                  </span>
+                  <span class="inline-flex items-center text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
+                    Verified Industry Lead
+                  </span>
+                </div>
+
+                <div class="flex items-center space-x-3.5 mt-4">
+                  <!-- Male Mentor Avatar (Sandeep Gowravam) -->
+                  <div class="relative w-14 h-14 rounded-2xl bg-gradient-to-tr from-slate-900 via-indigo-900 to-indigo-700 p-0.5 shadow-xs shrink-0 overflow-hidden">
+                    <svg viewBox="0 0 100 100" class="w-full h-full rounded-2xl bg-slate-900">
+                      <!-- Stylized male tech lead portrait with glasses -->
+                      <circle cx="50" cy="50" r="48" fill="#1e1b4b"/>
+                      <path d="M50 48 a18 18 0 1 0 0 -36 a18 18 0 0 0 0 36 z" fill="#fed7aa"/>
+                      <!-- Hair -->
+                      <path d="M32 28 c0 -16 36 -16 36 0 c-3 -5 -12 -9 -22 -9 c-8 0 -11 4 -14 9 z" fill="#09090b"/>
+                      <!-- Glasses -->
+                      <rect x="36" y="30" width="11" height="8" rx="2" fill="none" stroke="#0f172a" stroke-width="2"/>
+                      <rect x="53" y="30" width="11" height="8" rx="2" fill="none" stroke="#0f172a" stroke-width="2"/>
+                      <line x1="47" y1="34" x2="53" y2="34" stroke="#0f172a" stroke-width="2"/>
+                      <!-- Shoulders / Blazer -->
+                      <path d="M18 92 c4 -26 22 -32 32 -32 s28 6 32 32 z" fill="#312e81"/>
+                      <polygon points="50,68 46,80 50,90 54,80" fill="#f97316"/>
+                    </svg>
+                    <span class="absolute -bottom-0.5 -right-0.5 bg-blue-600 text-white rounded-full p-0.5 ring-2 ring-white">
+                      <i data-lucide="check" class="w-3 h-3"></i>
+                    </span>
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-slate-950 text-base leading-tight">Sandeep Gowravam</h3>
+                    <p class="text-xs text-indigo-700 font-semibold">Tech Lead &amp; Enterprise Architect</p>
+                    <p class="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1">
+                      <i data-lucide="check-check" class="w-3 h-3 text-emerald-600"></i> 48+ Verified Production Audits
+                    </p>
+                  </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-t border-slate-100 bg-slate-50/70 rounded-xl p-3 text-xs text-slate-600 space-y-1.5">
+                  <div class="flex justify-between">
+                    <span class="text-slate-500">Oversight Role:</span>
+                    <strong class="text-slate-800">Architecture, Security &amp; Gate Sign-off</strong>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-500">Next Sprint Audit:</span>
+                    <strong class="text-indigo-700 font-mono">Today, 5:30 PM IST</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-4 flex items-center gap-2">
+                <button onclick="openModal('modal-contact-mentor')" class="flex-1 bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 font-semibold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                  <i data-lucide="calendar" class="w-3.5 h-3.5 text-indigo-600"></i>
+                  Sync with Sandeep Gowravam
+                </button>
+                <button onclick="triggerToast('Direct line to Sandeep Gowravam active.')" class="p-2 border border-slate-200 hover:bg-slate-50 rounded-xl text-slate-600 transition" title="Direct Phone / WhatsApp">
+                  <i data-lucide="phone-call" class="w-4 h-4 text-emerald-600"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Student Developers Pod Card: M Kusuma, A Sireesha, K Neeraja (7 cols) -->
+            <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between hover:border-slate-300 transition">
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-xs font-bold uppercase tracking-wider text-slate-700 bg-slate-100 px-2.5 py-1 rounded-full flex items-center gap-1.5">
+                    <i data-lucide="code-2" class="w-3.5 h-3.5 text-indigo-600"></i> Assigned Student Developers
+                  </span>
+                  <span class="text-[11px] text-slate-500 font-medium">3 Vetted Engineers Assigned</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
+                  
+                  <!-- Developer 1: M Kusuma (Girl Avatar) -->
+                  <div class="border border-slate-200 rounded-xl p-3 bg-slate-50/50 hover:bg-white hover:border-indigo-200 transition">
+                    <div class="flex items-center space-x-2.5">
+                      <!-- Female Avatar Illustration 1 -->
+                      <div class="w-9 h-9 rounded-xl bg-rose-50 border border-rose-200 overflow-hidden shrink-0 flex items-center justify-center">
+                        <svg viewBox="0 0 100 100" class="w-full h-full">
+                          <rect width="100" height="100" fill="#ffe4e6"/>
+                          <path d="M50 48 a16 16 0 1 0 0 -32 a16 16 0 0 0 0 32 z" fill="#fcd34d"/>
+                          <path d="M30 24 c-2 18 42 18 40 0 c0 -14 -40 -14 -40 0 z" fill="#4c0519"/>
+                          <path d="M22 88 c3 -22 18 -26 28 -26 s25 4 28 26 z" fill="#e11d48"/>
+                          <!-- Hair bun -->
+                          <circle cx="50" cy="14" r="8" fill="#4c0519"/>
+                        </svg>
+                      </div>
+                      <div class="min-w-0">
+                        <h4 class="font-bold text-xs text-slate-900 truncate">M Kusuma</h4>
+                        <span class="text-[10px] text-rose-600 font-semibold block truncate">Full-Stack SDE</span>
+                      </div>
+                    </div>
+                    <div class="mt-2.5 pt-2 border-t border-slate-200/60 text-[10px] text-slate-500 space-y-0.5">
+                      <p class="truncate"><span class="font-medium text-slate-700">Tech:</span> React / REST APIs</p>
+                      <p class="text-emerald-700 font-mono font-semibold">18 commits this week</p>
+                    </div>
+                  </div>
+
+                  <!-- Developer 2: A Sireesha (Girl Avatar) -->
+                  <div class="border border-slate-200 rounded-xl p-3 bg-slate-50/50 hover:bg-white hover:border-indigo-200 transition">
+                    <div class="flex items-center space-x-2.5">
+                      <!-- Female Avatar Illustration 2 -->
+                      <div class="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-200 overflow-hidden shrink-0 flex items-center justify-center">
+                        <svg viewBox="0 0 100 100" class="w-full h-full">
+                          <rect width="100" height="100" fill="#e0e7ff"/>
+                          <path d="M50 48 a16 16 0 1 0 0 -32 a16 16 0 0 0 0 32 z" fill="#fed7aa"/>
+                          <path d="M32 20 c-6 24 42 24 36 0 c-2 -12 -34 -12 -36 0 z" fill="#1e1b4b"/>
+                          <path d="M22 88 c3 -22 18 -26 28 -26 s25 4 28 26 z" fill="#4f46e5"/>
+                          <!-- Headband -->
+                          <path d="M34 26 Q50 20 66 26" stroke="#f97316" stroke-width="4" fill="none"/>
+                        </svg>
+                      </div>
+                      <div class="min-w-0">
+                        <h4 class="font-bold text-xs text-slate-900 truncate">A Sireesha</h4>
+                        <span class="text-[10px] text-indigo-600 font-semibold block truncate">Frontend &amp; UI/UX</span>
+                      </div>
+                    </div>
+                    <div class="mt-2.5 pt-2 border-t border-slate-200/60 text-[10px] text-slate-500 space-y-0.5">
+                      <p class="truncate"><span class="font-medium text-slate-700">Tech:</span> Figma / Tailwind</p>
+                      <p class="text-emerald-700 font-mono font-semibold">24 commits this week</p>
+                    </div>
+                  </div>
+
+                  <!-- Developer 3: K Neeraja (Girl Avatar) -->
+                  <div class="border border-slate-200 rounded-xl p-3 bg-slate-50/50 hover:bg-white hover:border-indigo-200 transition">
+                    <div class="flex items-center space-x-2.5">
+                      <!-- Female Avatar Illustration 3 -->
+                      <div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-200 overflow-hidden shrink-0 flex items-center justify-center">
+                        <svg viewBox="0 0 100 100" class="w-full h-full">
+                          <rect width="100" height="100" fill="#ccfbf1"/>
+                          <path d="M50 48 a16 16 0 1 0 0 -32 a16 16 0 0 0 0 32 z" fill="#fde68a"/>
+                          <path d="M30 22 c-4 22 44 22 40 0 c0 -14 -40 -14 -40 0 z" fill="#134e4a"/>
+                          <path d="M22 88 c3 -22 18 -26 28 -26 s25 4 28 26 z" fill="#0d9488"/>
+                          <!-- Earrings -->
+                          <circle cx="34" cy="42" r="2.5" fill="#f59e0b"/>
+                          <circle cx="66" cy="42" r="2.5" fill="#f59e0b"/>
+                        </svg>
+                      </div>
+                      <div class="min-w-0">
+                        <h4 class="font-bold text-xs text-slate-900 truncate">K Neeraja</h4>
+                        <span class="text-[10px] text-teal-700 font-semibold block truncate">Backend &amp; DB SDE</span>
+                      </div>
+                    </div>
+                    <div class="mt-2.5 pt-2 border-t border-slate-200/60 text-[10px] text-slate-500 space-y-0.5">
+                      <p class="truncate"><span class="font-medium text-slate-700">Tech:</span> Postgres / Docker</p>
+                      <p class="text-emerald-700 font-mono font-semibold">15 commits this week</p>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- Pod Repo Status -->
+              <div class="mt-3.5 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between text-[11px] text-slate-500">
+                <span class="flex items-center gap-1.5 font-medium text-slate-700">
+                  <i data-lucide="git-pull-request" class="w-3.5 h-3.5 text-emerald-600"></i>
+                  GitHub Pod: <code class="text-indigo-600 font-mono font-semibold">swastik-pods/startup-x-mvp</code>
+                </span>
+                <button onclick="triggerToast('Displaying GitHub PR feed for Kusuma, Sireesha, and Neeraja')" class="text-indigo-600 hover:text-indigo-800 font-medium hover:underline flex items-center gap-1">
+                  View Commit Logs <i data-lucide="external-link" class="w-3 h-3"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- SECTION 2: SPRINT & MILESTONE TRACKER -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 pb-3 border-b border-slate-100 gap-2">
+            <div>
+              <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                <i data-lucide="git-merge" class="w-4 h-4 text-emerald-600"></i>
+                Sprint &amp; Milestone Tracker
+              </h2>
+              <p class="text-xs text-slate-500">Gated milestones audited by Sandeep Gowravam before release</p>
+            </div>
+            <span class="text-xs font-semibold px-2.5 py-1 bg-slate-100 rounded-lg text-slate-700 font-mono">Sprint 3 of 4</span>
+          </div>
+
+          <!-- 3-Milestone Workflow Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            <!-- Milestone 1: Completed -->
+            <div onclick="openMilestoneDetails('m1')" class="cursor-pointer border-2 border-emerald-500/30 bg-emerald-50/40 rounded-xl p-4 transition-all hover:shadow-md hover:border-emerald-500 relative flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-bold text-slate-900">Milestone 1</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                    <i data-lucide="check" class="w-3 h-3 mr-1"></i> Completed
+                  </span>
+                </div>
+                <h4 class="font-bold text-slate-900 text-sm">UI Wireframes &amp; Architecture</h4>
+                <p class="text-xs text-slate-600 mt-1">Figma component system by A Sireesha, schema model verified by Sandeep Gowravam.</p>
+              </div>
+
+              <div class="mt-4 pt-3 border-t border-emerald-200/50 flex items-center justify-between text-xs">
+                <span class="text-emerald-800 font-semibold">100% Verified</span>
+                <span class="text-slate-600 font-mono font-medium">₹50,000 Released</span>
+              </div>
+            </div>
+
+            <!-- Milestone 2: Under Audit (Focus) -->
+            <div onclick="openMilestoneDetails('m2')" class="cursor-pointer border-2 border-amber-400 bg-amber-50/40 rounded-xl p-4 transition-all hover:shadow-md relative flex flex-col justify-between ring-2 ring-amber-400/20">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-bold text-slate-900">Milestone 2</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1 animate-ping"></span>
+                    Under Audit
+                  </span>
+                </div>
+                <h4 class="font-bold text-slate-900 text-sm">Backend Integration &amp; APIs</h4>
+                <p class="text-xs text-slate-600 mt-1">REST API endpoints by M Kusuma &amp; K Neeraja, JWT tokens, PostgreSQL indexing.</p>
+                
+                <!-- Progress Bar -->
+                <div class="mt-3">
+                  <div class="flex justify-between text-[11px] font-semibold text-slate-600 mb-1">
+                    <span>Audit Status</span>
+                    <span class="text-amber-700">80% Approved</span>
+                  </div>
+                  <div class="w-full bg-slate-200 rounded-full h-2">
+                    <div class="bg-amber-500 h-2 rounded-full transition-all duration-500" style="width: 80%"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-3 pt-2 border-t border-amber-200/50 flex items-center justify-between text-xs">
+                <span class="inline-flex items-center gap-1 text-[11px] font-medium text-slate-800 bg-white/90 px-2 py-0.5 rounded border border-amber-200">
+                  <i data-lucide="user-check" class="w-3 h-3 text-amber-600"></i> Audited by Sandeep Gowravam
+                </span>
+                <span class="text-slate-600 font-mono text-[11px] font-semibold">₹50,000 Locked</span>
+              </div>
+            </div>
+
+            <!-- Milestone 3: Pending -->
+            <div onclick="openMilestoneDetails('m3')" class="cursor-pointer border border-slate-200 bg-slate-50/60 rounded-xl p-4 transition-all hover:shadow-md hover:border-slate-300 relative flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-bold text-slate-900">Milestone 3</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-700">
+                    Pending
+                  </span>
+                </div>
+                <h4 class="font-bold text-slate-900 text-sm">User Authentication &amp; Deployment</h4>
+                <p class="text-xs text-slate-500 mt-1">OAuth Google Login, Role-Based Access Control, automated Docker testing.</p>
+              </div>
+
+              <div class="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between text-xs">
+                <span class="text-slate-500 font-medium">Sprint 3 Target</span>
+                <span class="text-slate-400 font-mono">₹50,000 Locked</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- SECTION 3: MENTOR REVIEW & CLIENT APPROVAL / FEEDBACK SPLIT -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          
+          <!-- Mentor Review & Approval Section (7 cols) -->
+          <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                <h3 class="font-bold text-sm text-slate-900 flex items-center gap-2">
+                  <i data-lucide="file-badge" class="w-4 h-4 text-indigo-600"></i>
+                  Mentor Review &amp; Approval Section
+                </h3>
+                <span class="text-xs font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">Milestone 2</span>
+              </div>
+
+              <!-- Quality Metrics -->
+              <div class="bg-slate-50 rounded-xl p-4 border border-slate-200/80 mb-4">
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-xs font-semibold text-slate-700">Code Quality Review Status:</span>
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                    <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-600"></i>
+                    Status: Approved by Sandeep Gowravam
+                  </span>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2.5 text-center mt-2">
+                  <div class="bg-white p-2.5 rounded-lg border border-slate-200 shadow-2xs">
+                    <span class="text-[10px] text-slate-400 uppercase font-semibold block">Code Health</span>
+                    <span class="text-base font-bold text-emerald-600">96%</span>
+                  </div>
+                  <div class="bg-white p-2.5 rounded-lg border border-slate-200 shadow-2xs">
+                    <span class="text-[10px] text-slate-400 uppercase font-semibold block">Test Coverage</span>
+                    <span class="text-base font-bold text-indigo-600">92%</span>
+                  </div>
+                  <div class="bg-white p-2.5 rounded-lg border border-slate-200 shadow-2xs">
+                    <span class="text-[10px] text-slate-400 uppercase font-semibold block">Security Audit</span>
+                    <span class="text-base font-bold text-emerald-600">Grade A (0 Vuln)</span>
+                  </div>
+                </div>
+
+                <div class="mt-3 text-[11px] text-slate-600 flex items-start gap-1.5 bg-white p-2.5 rounded-lg border border-slate-200/60">
+                  <i data-lucide="message-square-quote" class="w-4 h-4 text-indigo-600 shrink-0 mt-0.5"></i>
+                  <p>
+                    <strong class="text-slate-800">Sandeep Gowravam (Mentor):</strong> 
+                    <em>"Reviewed Kusuma and Neeraja's backend implementation. PR passed security checks, connection pooling is optimized, and endpoints are production ready."</em>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
+              <button onclick="openModal('modal-code-review')" class="w-full sm:w-1/2 bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-semibold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition shadow-xs">
+                <i data-lucide="file-code" class="w-4 h-4 text-slate-600"></i>
+                Review Code Delivery
+              </button>
+              
+              <button onclick="openModal('modal-release-escrow')" id="btn-release-escrow" class="w-full sm:w-1/2 bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition shadow-md hover:shadow-lg">
+                <i data-lucide="lock" class="w-4 h-4 text-emerald-400"></i>
+                Approve &amp; Release Funds
+              </button>
+            </div>
+          </div>
+
+          <!-- Client Feedback & Discussion Panel (5 cols) -->
+          <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between h-[360px]">
+            <div>
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+                <div class="flex items-center gap-2">
+                  <h3 class="font-bold text-sm text-slate-900">Client Feedback Panel</h3>
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                </div>
+                <div class="flex items-center gap-1 text-[10px]">
+                  <span class="bg-indigo-50 text-indigo-700 font-semibold px-2 py-0.5 rounded">Active Pod Channel</span>
+                </div>
+              </div>
+
+              <!-- Real-time Message Stream -->
+              <div id="chat-stream" class="space-y-3 overflow-y-auto max-h-[200px] pr-1 text-xs">
+                
+                <!-- Sandeep Gowravam (Mentor) -->
+                <div class="flex items-start gap-2.5">
+                  <div class="w-7 h-7 rounded-full bg-indigo-900 text-white flex items-center justify-center font-bold text-[10px] shrink-0">
+                    SG
+                  </div>
+                  <div class="bg-indigo-50/80 border border-indigo-100 rounded-2xl p-2.5 text-slate-800 max-w-[85%]">
+                    <p class="font-bold text-[11px] text-indigo-950 flex items-center justify-between">
+                      <span>Sandeep Gowravam (Tech Lead)</span>
+                      <span class="text-[9px] text-slate-400 font-normal ml-2">10:14 AM</span>
+                    </p>
+                    <p class="mt-0.5 text-slate-700 leading-relaxed">Milestone 2 APIs have completed my architecture audit. Kusuma and Neeraja resolved all edge cases.</p>
+                  </div>
+                </div>
+
+                <!-- Client / Founder Message -->
+                <div class="flex items-start gap-2.5 flex-row-reverse">
+                  <div class="w-7 h-7 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-[10px] shrink-0">
+                    GS
+                  </div>
+                  <div class="bg-slate-900 text-white rounded-2xl p-2.5 max-w-[85%]">
+                    <p class="font-bold text-[11px] text-slate-200 flex items-center justify-between">
+                      <span>Mr G Sandeep Kumar (CEO)</span>
+                      <span class="text-[9px] text-slate-400 font-normal ml-2">10:25 AM</span>
+                    </p>
+                    <p class="mt-0.5 text-slate-100 leading-relaxed">Looks good, ready for testing on staging server.</p>
+                  </div>
+                </div>
+
+                <!-- Developer M Kusuma -->
+                <div class="flex items-start gap-2.5">
+                  <div class="w-7 h-7 rounded-full bg-rose-600 text-white flex items-center justify-center font-bold text-[10px] shrink-0">
+                    MK
+                  </div>
+                  <div class="bg-rose-50/70 border border-rose-100 rounded-2xl p-2.5 text-slate-800 max-w-[85%]">
+                    <p class="font-bold text-[11px] text-rose-950 flex items-center justify-between">
+                      <span>M Kusuma (Student Dev)</span>
+                      <span class="text-[9px] text-slate-400 font-normal ml-2">10:30 AM</span>
+                    </p>
+                    <p class="mt-0.5 text-slate-700 leading-relaxed">Staging build is deployed! Sireesha and I verified all endpoints on Postman.</p>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Chat Input Box -->
+            <form onsubmit="handleChatSubmit(event)" class="mt-3 pt-2 border-t border-slate-100 flex items-center gap-2">
+              <input type="text" id="chat-input" placeholder="Type a message to Mentor & Pod..." class="flex-1 bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition">
+              <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white p-2 rounded-xl transition shadow-xs flex items-center justify-center">
+                <i data-lucide="send" class="w-4 h-4"></i>
+              </button>
+            </form>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- TAB 2: MVP SCOPE & PRICING ESTIMATOR                     -->
+      <!-- ======================================================== -->
+      <section id="tab-pricing" class="tab-content space-y-6 hidden">
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+          <div class="max-w-3xl">
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <i data-lucide="calculator" class="w-5 h-5 text-indigo-600"></i>
+              Swastik Bottom-Up MVP Scope &amp; Pricing Estimator
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">
+              Transparent, student-led engineering under senior industry guidance. Standard 2-month MVP baseline begins at <strong>₹1,50,000</strong> per unit. Customize sprint deliverables below:
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-6">
+            <!-- Left: Options Controls (7 cols) -->
+            <div class="lg:col-span-7 space-y-5">
+              <!-- Sprint Duration Slider -->
+              <div>
+                <label class="block text-xs font-bold text-slate-800 mb-1.5 flex justify-between">
+                  <span>Sprint Cycle Duration</span>
+                  <span id="label-duration" class="text-indigo-600 font-mono font-bold">6 Weeks (3 Milestones)</span>
+                </label>
+                <input type="range" id="range-duration" min="4" max="12" step="2" value="6" oninput="calculateEstimate()" class="w-full accent-indigo-600">
+                <div class="flex justify-between text-[10px] text-slate-400 mt-1 font-medium">
+                  <span>4 Weeks (Rapid Prototype)</span>
+                  <span>6 Weeks (Standard MVP)</span>
+                  <span>12 Weeks (Enterprise Grade)</span>
+                </div>
+              </div>
+
+              <!-- Add-on Modules (Checkboxes) -->
+              <div class="space-y-3 pt-2">
+                <span class="text-xs font-bold text-slate-800 block">Select Scope Modules &amp; Engineering Packages:</span>
+                
+                <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+                  <div class="flex items-center space-x-3">
+                    <input type="checkbox" id="mod-core" checked disabled class="rounded text-indigo-600 w-4 h-4">
+                    <div>
+                      <p class="text-xs font-bold text-slate-900">Core Architecture &amp; Database Design</p>
+                      <p class="text-[11px] text-slate-500">Includes React frontend, Node/Postgres backend, basic auth.</p>
+                    </div>
+                  </div>
+                  <span class="text-xs font-mono font-bold text-slate-700">₹1,00,000 (Base)</span>
+                </label>
+
+                <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+                  <div class="flex items-center space-x-3">
+                    <input type="checkbox" id="mod-mentor" checked onchange="calculateEstimate()" class="rounded text-indigo-600 w-4 h-4">
+                    <div>
+                      <p class="text-xs font-bold text-slate-900">Senior Mentor Code Audit (Sandeep Gowravam)</p>
+                      <p class="text-[11px] text-slate-500">Weekly PR reviews, architecture governance, and milestone clearance.</p>
+                    </div>
+                  </div>
+                  <span class="text-xs font-mono font-bold text-indigo-600">+₹50,000</span>
+                </label>
+
+                <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+                  <div class="flex items-center space-x-3">
+                    <input type="checkbox" id="mod-payment" onchange="calculateEstimate()" class="rounded text-indigo-600 w-4 h-4">
+                    <div>
+                      <p class="text-xs font-bold text-slate-900">Payment Gateway &amp; Billing Escrow (Razorpay / Stripe)</p>
+                      <p class="text-[11px] text-slate-500">Webhooks, automated invoicing, secure tokenization.</p>
+                    </div>
+                  </div>
+                  <span class="text-xs font-mono font-bold text-slate-700">+₹20,000</span>
+                </label>
+
+                <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+                  <div class="flex items-center space-x-3">
+                    <input type="checkbox" id="mod-ai" onchange="calculateEstimate()" class="rounded text-indigo-600 w-4 h-4">
+                    <div>
+                      <p class="text-xs font-bold text-slate-900">Generative AI / LLM API Integration</p>
+                      <p class="text-[11px] text-slate-500">Prompt engineering, LangChain pipelines, OpenAI API.</p>
+                    </div>
+                  </div>
+                  <span class="text-xs font-mono font-bold text-slate-700">+₹35,000</span>
+                </label>
+
+                <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+                  <div class="flex items-center space-x-3">
+                    <input type="checkbox" id="mod-devops" onchange="calculateEstimate()" class="rounded text-indigo-600 w-4 h-4">
+                    <div>
+                      <p class="text-xs font-bold text-slate-900">Cloud CI/CD &amp; Automated Docker Deployments</p>
+                      <p class="text-[11px] text-slate-500">GitHub Actions pipeline, AWS/Vercel configuration, monitoring.</p>
+                    </div>
+                  </div>
+                  <span class="text-xs font-mono font-bold text-slate-700">+₹15,000</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Right: Dynamic Pricing Breakdown Card (5 cols) -->
+            <div class="lg:col-span-5 bg-slate-900 text-white rounded-2xl p-6 flex flex-col justify-between shadow-lg">
+              <div>
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <span class="text-xs uppercase tracking-wider text-slate-400 font-bold">Estimated Cost &amp; Pod Allocation</span>
+                  <span class="text-emerald-400 text-xs font-semibold">Fixed Price Quote</span>
+                </div>
+
+                <div class="mt-6 text-center">
+                  <span class="text-xs text-slate-400">Total Investment (INR)</span>
+                  <div class="text-4xl font-extrabold text-white font-mono mt-1" id="total-price-display">₹1,50,000</div>
+                  <span class="inline-block mt-2 text-[11px] bg-indigo-500/20 text-indigo-300 px-2.5 py-0.5 rounded-full border border-indigo-500/30">
+                    Swastik Standard Unit: ₹1.5L
+                  </span>
+                </div>
+
+                <!-- Breakdown list -->
+                <div class="space-y-2 mt-6 pt-6 border-t border-slate-800 text-xs text-slate-300 font-mono">
+                  <div class="flex justify-between">
+                    <span>Student Pod Stipend:</span>
+                    <span id="breakdown-student" class="text-white font-bold">₹75,000 (50%)</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Mentor Fees (Sandeep Gowravam):</span>
+                    <span id="breakdown-mentor" class="text-white font-bold">₹50,000 (33.3%)</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Platform Tools &amp; QA Escrow:</span>
+                    <span id="breakdown-platform" class="text-white font-bold">₹25,000 (16.7%)</span>
+                  </div>
+                </div>
+
+                <div class="mt-6 p-3 bg-slate-800/80 rounded-xl text-[11px] text-slate-300 space-y-1">
+                  <p class="font-bold text-slate-200">What's Guaranteed:</p>
+                  <p>✓ 100% Milestone-based escrow releases</p>
+                  <p>✓ Minimum 2 weekly senior tech lead audits</p>
+                  <p>✓ Full intellectual property (IP) assignment</p>
+                </div>
+              </div>
+
+              <button onclick="triggerToast('Scope statement generated and copied to clipboard!')" class="mt-6 w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-2">
+                <i data-lucide="file-down" class="w-4 h-4"></i>
+                Export Formal Scope Statement
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- TAB 3: MARKET POTENTIAL & 3-YEAR FINANCIALS              -->
+      <!-- ======================================================== -->
+      <section id="tab-financials" class="tab-content space-y-6 hidden">
+        
+        <!-- MARKET SIZING METRICS (TAM / SAM / SOM) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <!-- TAM Card -->
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+            <div class="flex items-center justify-between text-xs text-slate-500 font-medium">
+              <span>Total Addressable Market (TAM)</span>
+              <span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-bold">Global</span>
+            </div>
+            <div class="text-2xl font-black text-slate-900 mt-2 font-mono">$53.5 Billion</div>
+            <p class="text-xs text-slate-600 mt-1">Global custom software development services market demand (~₹4.4 Lakh Cr).</p>
+          </div>
+
+          <!-- SAM Card -->
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+            <div class="flex items-center justify-between text-xs text-slate-500 font-medium">
+              <span>Serviceable Addressable Market (SAM)</span>
+              <span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-bold">India Focused</span>
+            </div>
+            <div class="text-2xl font-black text-indigo-600 mt-2 font-mono">$2.5 Billion</div>
+            <p class="text-xs text-slate-600 mt-1">Indian early-stage startups &amp; MSMEs seeking custom software development (~₹20,500 Cr).</p>
+          </div>
+
+          <!-- SOM Card -->
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+            <div class="flex items-center justify-between text-xs text-slate-500 font-medium">
+              <span>Serviceable Obtainable Market (SOM)</span>
+              <span class="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-bold">2-Year Target</span>
+            </div>
+            <div class="text-2xl font-black text-emerald-600 mt-2 font-mono">₹45 Lakhs</div>
+            <p class="text-xs text-slate-600 mt-1">Direct bottom-up projection: <strong>30 client projects</strong> delivered at ₹1,50,000 average ticket size.</p>
+          </div>
+        </div>
+
+        <!-- 3-YEAR FINANCIAL PROJECTIONS TABLE & CHART -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <!-- Visual Chart (6 cols) -->
+          <div class="lg:col-span-6 bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-bold text-sm text-slate-900">3-Year Growth Projections</h3>
+              <span class="text-xs text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded">30% Margin at Scale</span>
+            </div>
+            <div class="h-64 relative">
+              <canvas id="financialsChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Financial Breakdown Summary (6 cols) -->
+          <div class="lg:col-span-6 bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                <h3 class="font-bold text-sm text-slate-900">Swastik Financial Trajectory (INR)</h3>
+                <span class="text-[11px] text-slate-400">Founder: Mr G Sandeep Kumar</span>
+              </div>
+
+              <!-- Table -->
+              <div class="overflow-x-auto text-xs">
+                <table class="w-full text-left">
+                  <thead>
+                    <tr class="text-slate-400 border-b border-slate-100">
+                      <th class="py-2">Metric</th>
+                      <th class="py-2 text-right">Year 1</th>
+                      <th class="py-2 text-right">Year 2</th>
+                      <th class="py-2 text-right">Year 3</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100 font-mono">
+                    <tr>
+                      <td class="py-2.5 font-sans font-medium text-slate-700">Client Projects</td>
+                      <td class="py-2.5 text-right font-bold text-slate-800">10</td>
+                      <td class="py-2.5 text-right font-bold text-slate-800">20</td>
+                      <td class="py-2.5 text-right font-bold text-slate-800">40</td>
+                    </tr>
+                    <tr class="bg-emerald-50/50">
+                      <td class="py-2.5 font-sans font-bold text-emerald-800">Total Revenue</td>
+                      <td class="py-2.5 text-right font-bold text-emerald-700">₹15,00,000</td>
+                      <td class="py-2.5 text-right font-bold text-emerald-700">₹30,00,000</td>
+                      <td class="py-2.5 text-right font-bold text-emerald-700">₹60,00,000</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2.5 font-sans text-slate-600">Total Expenses</td>
+                      <td class="py-2.5 text-right text-rose-600">₹12,00,000</td>
+                      <td class="py-2.5 text-right text-rose-600">₹22,00,000</td>
+                      <td class="py-2.5 text-right text-rose-600">₹42,00,000</td>
+                    </tr>
+                    <tr class="bg-indigo-50/50">
+                      <td class="py-2.5 font-sans font-bold text-indigo-900">Net Profit</td>
+                      <td class="py-2.5 text-right font-bold text-indigo-700">₹3,00,000</td>
+                      <td class="py-2.5 text-right font-bold text-indigo-700">₹8,00,000</td>
+                      <td class="py-2.5 text-right font-bold text-indigo-700">₹18,00,000</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2.5 font-sans text-slate-600">Net Margin (%)</td>
+                      <td class="py-2.5 text-right font-semibold text-slate-800">20.0%</td>
+                      <td class="py-2.5 text-right font-semibold text-slate-800">26.7%</td>
+                      <td class="py-2.5 text-right font-semibold text-emerald-600">30.0%</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+              <span>Validated for Wadhwani Foundation Submission</span>
+              <button onclick="triggerToast('Downloading 3-Year Financial Model (Excel)...')" class="text-indigo-600 hover:underline font-medium">Download Data Sheet</button>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- TAB 4: MY POD (TEAM) VIEW                                -->
+      <!-- ======================================================== -->
+      <section id="tab-team" class="tab-content space-y-6 hidden">
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+          <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+            <div>
+              <h2 class="text-base font-bold text-slate-900">Assigned Development Pod: Alpha-24</h2>
+              <p class="text-xs text-slate-500">Managed by Lead Mentor Sandeep Gowravam under Executive Oversight of Mr G Sandeep Kumar</p>
+            </div>
+            <button onclick="openModal('modal-contact-mentor')" class="text-xs bg-slate-900 hover:bg-slate-800 text-white font-semibold px-3 py-2 rounded-xl transition">
+              Schedule Team Standup
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <!-- Lead Mentor: Sandeep Gowravam -->
+            <div class="border border-indigo-200 bg-indigo-50/30 rounded-2xl p-4 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold text-indigo-700 uppercase tracking-wider bg-indigo-100 px-2 py-0.5 rounded">Industry Mentor</span>
+                <div class="mt-3 flex items-center space-x-3">
+                  <div class="w-12 h-12 rounded-xl bg-slate-900 overflow-hidden ring-2 ring-indigo-200 shrink-0">
+                    <svg viewBox="0 0 100 100" class="w-full h-full">
+                      <circle cx="50" cy="50" r="48" fill="#1e1b4b"/>
+                      <path d="M50 48 a18 18 0 1 0 0 -36 a18 18 0 0 0 0 36 z" fill="#fed7aa"/>
+                      <path d="M32 28 c0 -16 36 -16 36 0 c-3 -5 -12 -9 -22 -9 c-8 0 -11 4 -14 9 z" fill="#09090b"/>
+                      <rect x="36" y="30" width="11" height="8" rx="2" fill="none" stroke="#0f172a" stroke-width="2"/>
+                      <rect x="53" y="30" width="11" height="8" rx="2" fill="none" stroke="#0f172a" stroke-width="2"/>
+                      <line x1="47" y1="34" x2="53" y2="34" stroke="#0f172a" stroke-width="2"/>
+                      <path d="M18 92 c4 -26 22 -32 32 -32 s28 6 32 32 z" fill="#312e81"/>
+                      <polygon points="50,68 46,80 50,90 54,80" fill="#f97316"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-sm text-slate-900">Sandeep Gowravam</h4>
+                    <p class="text-xs text-indigo-700 font-semibold">Tech Lead &amp; Mentor</p>
+                  </div>
+                </div>
+                <p class="text-xs text-slate-500 mt-3">Enterprise systems architect. Directs weekly code audits, PR sign-offs, and architecture compliance.</p>
+              </div>
+              <div class="mt-4 pt-3 border-t border-indigo-100 text-[11px] text-indigo-900 font-semibold flex justify-between">
+                <span>Audits Conducted:</span>
+                <span>48 PRs</span>
+              </div>
+            </div>
+
+            <!-- Student 1: M Kusuma -->
+            <div class="border border-slate-200 bg-white rounded-2xl p-4 flex flex-col justify-between hover:border-slate-300 transition">
+              <div>
+                <span class="text-[10px] font-bold text-slate-600 uppercase tracking-wider bg-slate-100 px-2 py-0.5 rounded">Student Developer</span>
+                <div class="mt-3 flex items-center space-x-3">
+                  <div class="w-12 h-12 rounded-xl bg-rose-50 border border-rose-200 overflow-hidden shrink-0">
+                    <svg viewBox="0 0 100 100" class="w-full h-full">
+                      <rect width="100" height="100" fill="#ffe4e6"/>
+                      <path d="M50 48 a16 16 0 1 0 0 -32 a16 16 0 0 0 0 32 z" fill="#fcd34d"/>
+                      <path d="M30 24 c-2 18 42 18 40 0 c0 -14 -40 -14 -40 0 z" fill="#4c0519"/>
+                      <path d="M22 88 c3 -22 18 -26 28 -26 s25 4 28 26 z" fill="#e11d48"/>
+                      <circle cx="50" cy="14" r="8" fill="#4c0519"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-sm text-slate-900">M Kusuma</h4>
+                    <p class="text-xs text-rose-600 font-medium">Full-Stack SDE</p>
+                  </div>
+                </div>
+                <p class="text-xs text-slate-500 mt-3">Final year Computer Science student. Specializes in RESTful API development, JWT security, and state management.</p>
+              </div>
+              <div class="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-500 flex justify-between">
+                <span>Milestone Tasks:</span>
+                <span class="font-bold text-slate-800">12 / 12 Passed</span>
+              </div>
+            </div>
+
+            <!-- Student 2: A Sireesha -->
+            <div class="border border-slate-200 bg-white rounded-2xl p-4 flex flex-col justify-between hover:border-slate-300 transition">
+              <div>
+                <span class="text-[10px] font-bold text-slate-600 uppercase tracking-wider bg-slate-100 px-2 py-0.5 rounded">Student Developer</span>
+                <div class="mt-3 flex items-center space-x-3">
+                  <div class="w-12 h-12 rounded-xl bg-indigo-50 border border-indigo-200 overflow-hidden shrink-0">
+                    <svg viewBox="0 0 100 100" class="w-full h-full">
+                      <rect width="100" height="100" fill="#e0e7ff"/>
+                      <path d="M50 48 a16 16 0 1 0 0 -32 a16 16 0 0 0 0 32 z" fill="#fed7aa"/>
+                      <path d="M32 20 c-6 24 42 24 36 0 c-2 -12 -34 -12 -36 0 z" fill="#1e1b4b"/>
+                      <path d="M22 88 c3 -22 18 -26 28 -26 s25 4 28 26 z" fill="#4f46e5"/>
+                      <path d="M34 26 Q50 20 66 26" stroke="#f97316" stroke-width="4" fill="none"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-sm text-slate-900">A Sireesha</h4>
+                    <p class="text-xs text-indigo-600 font-medium">Frontend &amp; UI/UX</p>
+                  </div>
+                </div>
+                <p class="text-xs text-slate-500 mt-3">Design technologist. Skilled in Figma design tokens, responsive Tailwind architecture, and frontend interactivity.</p>
+              </div>
+              <div class="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-500 flex justify-between">
+                <span>Milestone Tasks:</span>
+                <span class="font-bold text-slate-800">10 / 10 Active</span>
+              </div>
+            </div>
+
+            <!-- Student 3: K Neeraja -->
+            <div class="border border-slate-200 bg-white rounded-2xl p-4 flex flex-col justify-between hover:border-slate-300 transition">
+              <div>
+                <span class="text-[10px] font-bold text-slate-600 uppercase tracking-wider bg-slate-100 px-2 py-0.5 rounded">Student Developer</span>
+                <div class="mt-3 flex items-center space-x-3">
+                  <div class="w-12 h-12 rounded-xl bg-teal-50 border border-teal-200 overflow-hidden shrink-0">
+                    <svg viewBox="0 0 100 100" class="w-full h-full">
+                      <rect width="100" height="100" fill="#ccfbf1"/>
+                      <path d="M50 48 a16 16 0 1 0 0 -32 a16 16 0 0 0 0 32 z" fill="#fde68a"/>
+                      <path d="M30 22 c-4 22 44 22 40 0 c0 -14 -40 -14 -40 0 z" fill="#134e4a"/>
+                      <path d="M22 88 c3 -22 18 -26 28 -26 s25 4 28 26 z" fill="#0d9488"/>
+                      <circle cx="34" cy="42" r="2.5" fill="#f59e0b"/>
+                      <circle cx="66" cy="42" r="2.5" fill="#f59e0b"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-sm text-slate-900">K Neeraja</h4>
+                    <p class="text-xs text-teal-700 font-medium">Backend &amp; DB SDE</p>
+                  </div>
+                </div>
+                <p class="text-xs text-slate-500 mt-3">Database engineer. Focused on relational indexing, query performance optimization, Docker pipelines and cache layers.</p>
+              </div>
+              <div class="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-500 flex justify-between">
+                <span>Milestone Tasks:</span>
+                <span class="font-bold text-slate-800">9 / 9 Active</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- TAB 5: SPRINTS & MILESTONES EXPANDED                     -->
+      <!-- ======================================================== -->
+      <section id="tab-sprints" class="tab-content space-y-6 hidden">
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+          <h2 class="text-base font-bold text-slate-900 mb-4">Sprint Delivery Roadmap &amp; Acceptance Gates</h2>
+          
+          <div class="space-y-4">
+            <!-- Sprint 1 -->
+            <div class="border border-slate-200 rounded-xl p-4 flex items-center justify-between bg-slate-50/50">
+              <div class="flex items-center space-x-4">
+                <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs">
+                  ✓
+                </div>
+                <div>
+                  <h4 class="font-bold text-sm text-slate-900">Sprint 1: UI Wireframes &amp; Architecture</h4>
+                  <p class="text-xs text-slate-500">Delivered on-schedule by A Sireesha. 100% acceptance sign-off by Sandeep Gowravam.</p>
+                </div>
+              </div>
+              <button onclick="openMilestoneDetails('m1')" class="text-xs font-semibold text-indigo-600 hover:underline">View Deliverables</button>
+            </div>
+
+            <!-- Sprint 2 -->
+            <div class="border border-amber-300 rounded-xl p-4 flex items-center justify-between bg-amber-50/40">
+              <div class="flex items-center space-x-4">
+                <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs animate-pulse">
+                  2
+                </div>
+                <div>
+                  <h4 class="font-bold text-sm text-slate-900">Sprint 2: Backend Integration &amp; REST APIs</h4>
+                  <p class="text-xs text-slate-600">80% completed by M Kusuma &amp; K Neeraja. Audit approved by Sandeep Gowravam.</p>
+                </div>
+              </div>
+              <button onclick="openMilestoneDetails('m2')" class="text-xs font-semibold text-amber-800 hover:underline">Review &amp; Approve</button>
+            </div>
+
+            <!-- Sprint 3 -->
+            <div class="border border-slate-200 rounded-xl p-4 flex items-center justify-between bg-white">
+              <div class="flex items-center space-x-4">
+                <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-xs">
+                  3
+                </div>
+                <div>
+                  <h4 class="font-bold text-sm text-slate-900">Sprint 3: User Authentication &amp; Deployment</h4>
+                  <p class="text-xs text-slate-500">Sprint in development. Target completion in 10 days.</p>
+                </div>
+              </div>
+              <button onclick="openMilestoneDetails('m3')" class="text-xs font-semibold text-slate-500 hover:underline">View Scope</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- TAB 6: MENTOR SIGN-OFFS & QUALITY AUDITS                 -->
+      <!-- ======================================================== -->
+      <section id="tab-reviews" class="tab-content space-y-6 hidden">
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+          <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+            <div>
+              <h2 class="text-base font-bold text-slate-900">Senior Mentor Code Sign-Off Log</h2>
+              <p class="text-xs text-slate-500">Quality sign-offs executed by Sandeep Gowravam</p>
+            </div>
+            <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-full">Gate: ACTIVE</span>
+          </div>
+
+          <div class="space-y-3">
+            <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div>
+                <span class="text-[10px] font-mono text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded font-bold">PR #12 — AUDITED</span>
+                <h4 class="font-bold text-sm text-slate-900 mt-1">Milestone 2 API Architecture &amp; Database Indexing</h4>
+                <p class="text-xs text-slate-600 mt-0.5">Audited by: <strong>Sandeep Gowravam</strong> • Developers: M Kusuma, K Neeraja • Test coverage: 92%</p>
+              </div>
+              <button onclick="openModal('modal-code-review')" class="text-xs bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold px-3 py-1.5 rounded-lg shadow-2xs">
+                Inspect Audit Diff
+              </button>
+            </div>
+
+            <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div>
+                <span class="text-[10px] font-mono text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded font-bold">PR #08 — AUDITED</span>
+                <h4 class="font-bold text-sm text-slate-900 mt-1">Milestone 1 Figma Wireframe Design System Validation</h4>
+                <p class="text-xs text-slate-600 mt-0.5">Audited by: <strong>Sandeep Gowravam</strong> • Developer: A Sireesha • Responsive specs confirmed</p>
+              </div>
+              <button onclick="triggerToast('Viewing Milestone 1 Design System')" class="text-xs bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold px-3 py-1.5 rounded-lg shadow-2xs">
+                Inspect Audit Diff
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- TAB 7: APPROVALS & FILES                                 -->
+      <!-- ======================================================== -->
+      <section id="tab-files" class="tab-content space-y-6 hidden">
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+          <h2 class="text-base font-bold text-slate-900 mb-2">Project Artifacts &amp; Legal Escrow Files</h2>
+          <p class="text-xs text-slate-500 mb-5">All intellectual property and code repositories are permanently assigned to the client.</p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="border border-slate-200 rounded-xl p-4 flex items-center justify-between hover:bg-slate-50 transition">
+              <div class="flex items-center space-x-3">
+                <i data-lucide="file-text" class="w-8 h-8 text-indigo-600"></i>
+                <div>
+                  <h4 class="font-bold text-xs text-slate-900">Signed NDA &amp; IP Assignment Contract.pdf</h4>
+                  <p class="text-[10px] text-slate-400">Countersigned by CEO Mr G Sandeep Kumar • 240 KB</p>
+                </div>
+              </div>
+              <button onclick="triggerToast('Downloading legal contract PDF...')" class="p-2 text-slate-500 hover:text-slate-800">
+                <i data-lucide="download" class="w-4 h-4"></i>
+              </button>
+            </div>
+
+            <div class="border border-slate-200 rounded-xl p-4 flex items-center justify-between hover:bg-slate-50 transition">
+              <div class="flex items-center space-x-3">
+                <i data-lucide="figma" class="w-8 h-8 text-pink-600"></i>
+                <div>
+                  <h4 class="font-bold text-xs text-slate-900">Master Prototype Design System (Figma)</h4>
+                  <p class="text-[10px] text-slate-400">Created by A Sireesha • Interactive prototype</p>
+                </div>
+              </div>
+              <button onclick="triggerToast('Redirecting to Figma master board...')" class="p-2 text-slate-500 hover:text-slate-800">
+                <i data-lucide="external-link" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- TAB 8: CLIENT FEEDBACK CHANNEL                           -->
+      <!-- ======================================================== -->
+      <section id="tab-feedback" class="tab-content space-y-6 hidden">
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs max-w-3xl">
+          <h2 class="text-base font-bold text-slate-900 mb-1">Direct Pod &amp; Mentor Communication Stream</h2>
+          <p class="text-xs text-slate-500 mb-4">Direct channel connecting CEO Mr G Sandeep Kumar, Mentor Sandeep Gowravam, and developers (M Kusuma, A Sireesha, K Neeraja).</p>
+          
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 mb-4">
+            <p class="font-semibold text-slate-800">Communication Guidelines:</p>
+            <p class="mt-1">All sprint revision requests submitted here are synced with the GitHub project board within 1 hour during active sprints.</p>
+          </div>
+
+          <button onclick="switchTab('dashboard')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-4 py-2 rounded-xl transition">
+            Go to Live Dashboard Feed
+          </button>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- TAB 9: SETTINGS                                          -->
+      <!-- ======================================================== -->
+      <section id="tab-settings" class="tab-content space-y-6 hidden">
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs max-w-2xl">
+          <h2 class="text-base font-bold text-slate-900 mb-4">Client Project Settings</h2>
+          
+          <div class="space-y-4 text-xs">
+            <div>
+              <label class="block font-medium text-slate-700 mb-1">Company / Startup Name</label>
+              <input type="text" value="Startup X Technologies Pvt. Ltd." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-800">
+            </div>
+
+            <div>
+              <label class="block font-medium text-slate-700 mb-1">Executive Sponsor</label>
+              <input type="text" value="Mr G Sandeep Kumar (Founder & CEO)" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-800" readonly>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <p class="font-bold text-slate-800">Instant WhatsApp Milestone Notifications</p>
+                <p class="text-slate-400 text-[11px]">Receive code review and sign-off updates from Sandeep Gowravam</p>
+              </div>
+              <input type="checkbox" checked class="w-4 h-4 accent-indigo-600">
+            </div>
+
+            <div class="pt-4">
+              <button onclick="triggerToast('Settings updated successfully!')" class="bg-slate-900 text-white font-semibold px-4 py-2 rounded-xl text-xs hover:bg-slate-800 transition">
+                Save Preferences
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 1: CODE REVIEW & AUDIT DETAILS                     -->
+  <!-- ======================================================== -->
+  <div id="modal-code-review" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs hidden">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 overflow-hidden transform transition-all">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div>
+          <span class="text-[10px] font-mono text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded font-bold">AUDIT REPORT #M2-89</span>
+          <h3 class="font-bold text-base text-slate-900 mt-1">Milestone 2 Deliverables: Backend API Suite</h3>
+        </div>
+        <button onclick="closeModal('modal-code-review')" class="text-slate-400 hover:text-slate-600 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="mt-4 space-y-4 max-h-[60vh] overflow-y-auto pr-1 text-xs">
+        <!-- Mentor Verification Card -->
+        <div class="bg-emerald-50/70 border border-emerald-200 rounded-xl p-3 flex items-start gap-3">
+          <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <p class="font-bold text-emerald-950">Mentor Sign-off Confirmed: Sandeep Gowravam</p>
+            <p class="text-emerald-900 mt-0.5 leading-relaxed">
+              "I have thoroughly reviewed the REST API pull requests from M Kusuma and K Neeraja. Database connection pooling is configured with pgBouncer, JWT tokens are protected via HttpOnly cookies, and test coverage is passing at 92%. The codebase is verified production grade."
+            </p>
+          </div>
+        </div>
+
+        <!-- Git Commits Inspected -->
+        <div>
+          <h4 class="font-bold text-slate-800 mb-2">Verified Commits by Student Pod:</h4>
+          <div class="space-y-1.5 font-mono text-[11px]">
+            <div class="p-2 bg-slate-100 rounded-lg flex items-center justify-between">
+              <span class="text-indigo-700 truncate">feat(api): implement JWT token auth middleware — M Kusuma</span>
+              <span class="text-slate-400 shrink-0 font-bold">#a71f83c</span>
+            </div>
+            <div class="p-2 bg-slate-100 rounded-lg flex items-center justify-between">
+              <span class="text-teal-700 truncate">fix(db): add index on client_org_id for fast queries — K Neeraja</span>
+              <span class="text-slate-400 shrink-0 font-bold">#99c0d2b</span>
+            </div>
+            <div class="p-2 bg-slate-100 rounded-lg flex items-center justify-between">
+              <span class="text-rose-700 truncate">test: add 14 integration test suites using Supertest — M Kusuma</span>
+              <span class="text-slate-400 shrink-0 font-bold">#310ee9a</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+        <button onclick="closeModal('modal-code-review')" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-50 transition">
+          Close Inspection
+        </button>
+        <button onclick="closeModal('modal-code-review'); openModal('modal-release-escrow')" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs flex items-center gap-1.5 transition">
+          Proceed to Approve Funds
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 2: APPROVE & RELEASE FUNDS (ESCROW)                -->
+  <!-- ======================================================== -->
+  <div id="modal-release-escrow" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs hidden">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 transform transition-all text-center">
+      <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl mx-auto flex items-center justify-center mb-4">
+        <i data-lucide="shield-check" class="w-7 h-7"></i>
+      </div>
+
+      <h3 class="font-extrabold text-lg text-slate-900">Approve Milestone 2 Release?</h3>
+      <p class="text-xs text-slate-500 mt-1">
+        You are approving completion of <strong>Sprint 2: Backend Integration</strong>. This action will release the milestone escrow to the pod and mentor.
+      </p>
+
+      <div class="my-4 bg-slate-50 border border-slate-200 rounded-xl p-3 text-left text-xs space-y-1.5 font-mono">
+        <div class="flex justify-between text-slate-600">
+          <span>Sprint Escrow Release:</span>
+          <span class="font-bold text-slate-900">₹50,000</span>
+        </div>
+        <div class="flex justify-between text-slate-500 text-[11px]">
+          <span>Student Pod Stipend (Kusuma, Sireesha, Neeraja):</span>
+          <span>₹25,000</span>
+        </div>
+        <div class="flex justify-between text-slate-500 text-[11px]">
+          <span>Mentor Review (Sandeep Gowravam):</span>
+          <span>₹17,000</span>
+        </div>
+        <div class="flex justify-between text-slate-500 text-[11px]">
+          <span>Swastik Operations &amp; Tools:</span>
+          <span>₹8,000</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button onclick="closeModal('modal-release-escrow')" class="w-1/2 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold text-xs hover:bg-slate-100 transition">
+          Cancel
+        </button>
+        <button onclick="confirmEscrowRelease()" class="w-1/2 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition shadow-md">
+          Confirm &amp; Release
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 3: MILESTONE DRILLDOWN DETAILS                     -->
+  <!-- ======================================================== -->
+  <div id="modal-milestone" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs hidden">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 id="modal-m-title" class="font-bold text-slate-900 text-sm">Milestone Details</h3>
+        <button onclick="closeModal('modal-milestone')" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div id="modal-m-content" class="mt-4 text-xs text-slate-600 space-y-2"></div>
+      <div class="mt-5 pt-3 border-t border-slate-100 flex justify-end">
+        <button onclick="closeModal('modal-milestone')" class="px-4 py-2 bg-slate-900 text-white font-semibold rounded-xl text-xs">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 4: SYNC WITH MENTOR (CALENDAR / SCHEDULE)          -->
+  <!-- ======================================================== -->
+  <div id="modal-contact-mentor" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs hidden">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="calendar" class="w-4 h-4 text-indigo-600"></i>
+          <h3 class="font-bold text-slate-900 text-sm">Book Mentor Consultation</h3>
+        </div>
+        <button onclick="closeModal('modal-contact-mentor')" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="mt-4 space-y-3 text-xs">
+        <p class="text-slate-600">Schedule a 30-minute sprint review call with <strong>Sandeep Gowravam</strong> (Tech Lead):</p>
+        
+        <div>
+          <label class="block font-medium text-slate-700 mb-1">Select Available Slot (Today / Tomorrow)</label>
+          <select class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-800">
+            <option>Today: 5:30 PM – 6:00 PM IST (Recommended)</option>
+            <option>Tomorrow: 10:00 AM – 10:30 AM IST</option>
+            <option>Tomorrow: 6:00 PM – 6:30 PM IST</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-medium text-slate-700 mb-1">Agenda / Discussion Points</label>
+          <textarea rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-800" placeholder="e.g., Reviewing user authentication and Google OAuth architecture before starting sprint 3..."></textarea>
+        </div>
+      </div>
+
+      <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+        <button onclick="closeModal('modal-contact-mentor')" class="px-3.5 py-2 border border-slate-200 text-slate-600 rounded-xl text-xs hover:bg-slate-50">Cancel</button>
+        <button onclick="closeModal('modal-contact-mentor'); triggerToast('Mentor calendar invite sent to Mr G Sandeep Kumar!')" class="px-4 py-2 bg-indigo-600 text-white font-semibold rounded-xl text-xs hover:bg-indigo-500 shadow-xs">
+          Confirm Booking
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- JAVASCRIPT APPLICATION LOGIC                             -->
+  <!-- ======================================================== -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      initFinancialChart();
+      calculateEstimate();
+    });
+
+    // 1. Mobile Sidebar Toggle
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      const isHidden = sidebar.classList.contains('-translate-x-full');
+      
+      if (isHidden) {
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+      }
+    }
+
+    // 2. Tab Navigation System
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      
+      document.querySelectorAll('.nav-item').forEach(el => {
+        el.className = 'nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-xs text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors';
+      });
+
+      const targetTab = document.getElementById('tab-' + tabId);
+      if (targetTab) {
+        targetTab.classList.remove('hidden');
+      }
+
+      const activeNav = document.getElementById('nav-' + tabId);
+      if (activeNav) {
+        activeNav.className = 'nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-xs transition-colors bg-slate-900 text-white shadow-xs';
+      }
+
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar.classList.contains('-translate-x-full') && window.innerWidth < 768) {
+        toggleMobileSidebar();
+      }
+
+      setTimeout(() => lucide.createIcons(), 50);
+    }
+
+    // 3. Notification Dropdown Toggle
+    function toggleNotificationDropdown() {
+      const dropdown = document.getElementById('notification-dropdown');
+      dropdown.classList.toggle('hidden');
+    }
+
+    // 4. Modal Helpers
+    function openModal(modalId) {
+      document.getElementById(modalId).classList.remove('hidden');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.add('hidden');
+    }
+
+    // 5. Toast Feedback System
+    function triggerToast(message) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'pointer-events-auto bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center space-x-2 text-xs border border-slate-700 transition-all duration-300 transform translate-y-2 opacity-0';
+      toast.innerHTML = `
+        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+      lucide.createIcons();
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // 6. Interactive Milestone Details Popup
+    function openMilestoneDetails(mId) {
+      const titleEl = document.getElementById('modal-m-title');
+      const contentEl = document.getElementById('modal-m-content');
+
+      if (mId === 'm1') {
+        titleEl.innerText = "Milestone 1: UI Wireframes & Architecture";
+        contentEl.innerHTML = `
+          <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-900">
+            <strong>Status: Completed &amp; Released (₹50,000)</strong>
+          </div>
+          <p><strong>Deliverables Completed:</strong></p>
+          <ul class="list-disc pl-5 space-y-1">
+            <li>Interactive High-Fidelity Figma design system by <strong>A Sireesha</strong> (42 screens)</li>
+            <li>PostgreSQL schema ER-diagram verified by <strong>Sandeep Gowravam</strong></li>
+            <li>System Architecture Document &amp; Swagger API contracts</li>
+          </ul>
+        `;
+      } else if (mId === 'm2') {
+        titleEl.innerText = "Milestone 2: Backend Integration & APIs (Under Audit)";
+        contentEl.innerHTML = `
+          <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-amber-900">
+            <strong>Status: 80% Completed • Approved by Sandeep Gowravam</strong>
+          </div>
+          <p><strong>Deliverables:</strong></p>
+          <ul class="list-disc pl-5 space-y-1">
+            <li>REST API endpoint suite implemented by <strong>M Kusuma</strong></li>
+            <li>PostgreSQL database indexing &amp; migration scripts by <strong>K Neeraja</strong></li>
+            <li>JWT Token rotation and secure HTTP-only cookies verified</li>
+          </ul>
+          <div class="mt-3">
+            <button onclick="closeModal('modal-milestone'); openModal('modal-release-escrow')" class="w-full bg-slate-900 text-white py-2 rounded-xl text-xs font-semibold hover:bg-slate-800 transition">
+              Approve Milestone &amp; Release Escrow (₹50,000)
+            </button>
+          </div>
+        `;
+      } else {
+        titleEl.innerText = "Milestone 3: User Authentication & Deployment";
+        contentEl.innerHTML = `
+          <div class="p-3 bg-slate-100 rounded-xl border border-slate-200 text-slate-700">
+            <strong>Status: Pending Sprint Kickoff (₹50,000 in Escrow)</strong>
+          </div>
+          <p><strong>Scope Plan:</strong></p>
+          <ul class="list-disc pl-5 space-y-1">
+            <li>Google OAuth integration &amp; Role-Based Access Control (M Kusuma &amp; A Sireesha)</li>
+            <li>Docker containerization and automated CI/CD pipeline (K Neeraja)</li>
+            <li>Final quality sign-off by Sandeep Gowravam</li>
+          </ul>
+        `;
+      }
+      openModal('modal-milestone');
+    }
+
+    // 7. Interactive Escrow Release Handler
+    function confirmEscrowRelease() {
+      closeModal('modal-release-escrow');
+      
+      const btn = document.getElementById('btn-release-escrow');
+      if (btn) {
+        btn.innerHTML = `<i data-lucide="check" class="w-4 h-4 text-white"></i> Escrow Funds Released`;
+        btn.className = "w-full sm:w-1/2 bg-emerald-600 text-white font-semibold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 cursor-default";
+      }
+      
+      triggerToast("Success! ₹50,000 released from Escrow for Milestone 2.");
+      lucide.createIcons();
+    }
+
+    // 8. Dynamic Scope & Pricing Estimator
+    function calculateEstimate() {
+      const durationWeeks = parseInt(document.getElementById('range-duration').value);
+      const isMentor = document.getElementById('mod-mentor').checked;
+      const isPayment = document.getElementById('mod-payment').checked;
+      const isAI = document.getElementById('mod-ai').checked;
+      const isDevOps = document.getElementById('mod-devops').checked;
+
+      let base = 100000;
+      if (isMentor) base += 50000;
+      if (isPayment) base += 20000;
+      if (isAI) base += 35000;
+      if (isDevOps) base += 15000;
+
+      const milestonesCount = Math.round(durationWeeks / 2);
+      document.getElementById('label-duration').innerText = `${durationWeeks} Weeks (${milestonesCount} Milestones)`;
+
+      const formatted = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(base);
+      document.getElementById('total-price-display').innerText = formatted;
+
+      const studentStipend = Math.round(base * 0.50);
+      const mentorFee = Math.round(base * (isMentor ? 0.33 : 0.20));
+      const platformFee = base - studentStipend - mentorFee;
+
+      document.getElementById('breakdown-student').innerText = `₹${studentStipend.toLocaleString('en-IN')}`;
+      document.getElementById('breakdown-mentor').innerText = `₹${mentorFee.toLocaleString('en-IN')}`;
+      document.getElementById('breakdown-platform').innerText = `₹${platformFee.toLocaleString('en-IN')}`;
+    }
+
+    // 9. Interactive Chat Feed
+    function handleChatSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('chat-input');
+      const val = input.value.trim();
+      if (!val) return;
+
+      const chatStream = document.getElementById('chat-stream');
+      const msg = document.createElement('div');
+      msg.className = "flex items-start gap-2.5 flex-row-reverse";
+      msg.innerHTML = `
+        <div class="w-7 h-7 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-[10px] shrink-0">
+          GS
+        </div>
+        <div class="bg-slate-900 text-white rounded-2xl p-2.5 max-w-[85%] text-xs">
+          <p class="font-bold text-[11px] text-slate-200 flex items-center justify-between">
+            <span>Mr G Sandeep Kumar (CEO)</span>
+            <span class="text-[9px] text-slate-400 font-normal ml-2">Just now</span>
+          </p>
+          <p class="mt-0.5 text-slate-100 leading-relaxed">${val}</p>
+        </div>
+      `;
+      chatStream.appendChild(msg);
+      chatStream.scrollTop = chatStream.scrollHeight;
+      input.value = "";
+
+      triggerToast("Message sent to Mentor Sandeep Gowravam & Student Pod");
+
+      // Automated simulated response from Lead Mentor Sandeep Gowravam
+      setTimeout(() => {
+        const reply = document.createElement('div');
+        reply.className = "flex items-start gap-2.5";
+        reply.innerHTML = `
+          <div class="w-7 h-7 rounded-full bg-indigo-900 text-white flex items-center justify-center font-bold text-[10px] shrink-0">
+            SG
+          </div>
+          <div class="bg-indigo-50/80 border border-indigo-100 rounded-2xl p-2.5 text-slate-800 max-w-[85%] text-xs">
+            <p class="font-bold text-[11px] text-indigo-950 flex items-center justify-between">
+              <span>Sandeep Gowravam (Tech Lead)</span>
+              <span class="text-[9px] text-slate-400 font-normal ml-2">Just now</span>
+            </p>
+            <p class="mt-0.5 text-slate-700 leading-relaxed">Acknowledged, Sandeep! Kusuma and Sireesha are tracking this on the sprint board right away.</p>
+          </div>
+        `;
+        chatStream.appendChild(reply);
+        chatStream.scrollTop = chatStream.scrollHeight;
+      }, 1500);
+    }
+
+    // 10. Financial Projections Chart
+    function initFinancialChart() {
+      const ctx = document.getElementById('financialsChart');
+      if (!ctx) return;
+
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Year 1', 'Year 2', 'Year 3'],
+          datasets: [
+            {
+              label: 'Revenue (₹ Lakhs)',
+              data: [15, 30, 60],
+              backgroundColor: '#10b981',
+              borderRadius: 6
+            },
+            {
+              label: 'Expenses (₹ Lakhs)',
+              data: [12, 22, 42],
+              backgroundColor: '#f43f5e',
+              borderRadius: 6
+            },
+            {
+              label: 'Net Profit (₹ Lakhs)',
+              data: [3, 8, 18],
+              backgroundColor: '#4f46e5',
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                boxWidth: 12,
+                font: { family: 'Inter', size: 11 }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return context.dataset.label + ': ₹' + context.raw + 'L';
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) { return '₹' + value + 'L'; },
+                font: { family: 'Inter', size: 10 }
+              },
+              grid: { color: '#f1f5f9' }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { font: { family: 'Inter', size: 11, weight: 'bold' } }
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
